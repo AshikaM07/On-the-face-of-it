@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AI Assistant — On The Face Of It</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-logo"><span class="nav-eye">👁</span><span>On The Face Of It</span></div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="summary.html">Summary</a></li>
+    <li><a href="flashcards.html">Flashcards</a></li><li><a href="quiz.html">Quiz</a></li>
+    <li><a href="assistant.html" class="active">AI Assistant</a></li><li><a href="video.html">Animated Story</a></li>
+  </ul>
+  <div class="nav-toggle" id="navToggle">☰</div>
+</nav>
+
+<section class="page-hero">
+  <p class="page-hero-tag">🤖 AI Assistant</p>
+  <h1>Ask the Story Expert</h1>
+  <p>Powered by Claude AI. Ask anything about characters, themes, quotes, and more.</p>
+</section>
+
+<div class="page-content">
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-avatar">🌿</div>
+      <div class="chat-header-info">
+        <h3>Mr. Lamb's Garden AI</h3>
+        <p><span class="status-dot"></span>Expert on "On The Face Of It"</p>
+      </div>
+    </div>
+
+    <div class="quick-questions">
+      <button class="quick-q" onclick="sendQuick('What are the main themes?')">Main Themes</button>
+      <button class="quick-q" onclick="sendQuick('Describe Mr. Lamb\'s character')">Mr. Lamb</button>
+      <button class="quick-q" onclick="sendQuick('How does Derry change in the play?')">Derry\'s Journey</button>
+      <button class="quick-q" onclick="sendQuick('Explain the symbolism of the garden')">Garden Symbolism</button>
+      <button class="quick-q" onclick="sendQuick('What is the significance of the title?')">Title Meaning</button>
+      <button class="quick-q" onclick="sendQuick('Analyze the ending of the play')">The Ending</button>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot">
+        <div class="msg-avatar">🌿</div>
+        <div class="msg-bubble">
+          Welcome! I'm your expert guide to <em>On The Face Of It</em> by Susan Hill. 
+          Ask me anything — about the characters, themes, quotes, literary devices, CBSE exam questions, or anything else about this beautiful play. I'm here to help you truly understand and appreciate the story. 🌻
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chatInput" 
+        placeholder="Ask anything about the play..." 
+        onkeypress="if(event.key==='Enter')sendMessage()"/>
+      <button class="btn-primary" onclick="sendMessage()" style="padding:1rem 1.5rem;">Send</button>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:2rem;">
+    <p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.08em;">
+      Powered by Claude AI · Specialized in CBSE Class 12 Literature
+    </p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">👁 On The Face Of It</div>
+    <div class="footer-links">
+      <a href="index.html">Home</a><a href="summary.html">Summary</a>
+      <a href="flashcards.html">Flashcards</a><a href="quiz.html">Quiz</a>
+    </div>
+  </div>
+</footer>
+<script src="js/main.js"></script>
+<script>
+const SYSTEM_PROMPT = `You are an expert literary guide specializing in the one-act play "On The Face Of It" by Susan Hill, included in the CBSE Class 12 English supplementary reader "Vistas."
+
+Your role:
+- Answer all questions about the play thoroughly and educationally
+- Help students understand characters (Derry, Mr. Lamb, Derry's mother)
+- Explain themes: isolation, acceptance, disability, human connection, life/death, optimism
+- Analyze symbols: the garden, open gate, crab apples, tin leg, scarred face, ladder
+- Discuss literary devices: irony, symbolism, contrast, dialogue, anecdote, foreshadowing
+- Help with CBSE exam preparation — answer-writing, important questions, character sketches
+- Quote from the play when relevant
+- Be warm, encouraging, and make the play come alive for students
+
+Keep responses clear, educational, and appropriately detailed. Use literary terminology where relevant. Format using markdown when helpful.`;
+
+const conversationHistory = [];
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+  showTyping();
+
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: conversationHistory })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Server error');
+    const reply = data.reply || '';
+    removeTyping();
+    addMessage('bot', reply);
+    conversationHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    removeTyping();
+    addMessage('bot', 'Sorry, I couldn\'t connect right now. Make sure the server is running and OPENROUTER_API_KEY is set.');
+  }
+}
+
+function sendQuick(text) {
+  document.getElementById('chatInput').value = text;
+  sendMessage();
+}
+
+function addMessage(role, text) {
+  const messages = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `message ${role}`;
+  
+  // Convert markdown-like formatting
+  let html = text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+
+  div.innerHTML = `
+    <div class="msg-avatar">${role === 'bot' ? '🌿' : '👤'}</div>
+    <div class="msg-bubble"><p>${html}</p></div>
+  `;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function showTyping() {
+  const messages = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'message bot';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <div class="msg-avatar">🌿</div>
+    <div class="msg-bubble">
+      <div class="typing-indicator">
+        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+      </div>
+    </div>
+  `;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function removeTyping() {
+  const indicator = document.getElementById('typingIndicator');
+  if (indicator) indicator.remove();
+}
+</script>
+</body>
+</html>

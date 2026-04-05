@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Flashcards — On The Face Of It</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── Filter tabs ── */
+    .filter-tabs { display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap; margin-bottom:2rem; }
+    .filter-tab {
+      padding:0.5rem 1.2rem; border-radius:999px;
+      border:1px solid rgba(127,176,105,0.2); background:transparent;
+      color:var(--text-muted); font-family:var(--font-mono); font-size:0.65rem;
+      letter-spacing:0.08em; cursor:pointer; transition:all 0.3s; text-transform:uppercase;
+    }
+    .filter-tab.active, .filter-tab:hover {
+      background:rgba(127,176,105,0.12); border-color:var(--green-primary); color:var(--green-light);
+    }
+
+    /* ── AI generate section ── */
+    .ai-generate-section { max-width:680px; margin:0 auto 3rem; text-align:center; }
+    .ai-topic-input {
+      width:100%; padding:1rem 1.5rem; border-radius:10px; margin-bottom:1rem;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(127,176,105,0.25);
+      color:var(--text-primary); font-family:var(--font-body); font-size:1rem; outline:none;
+      backdrop-filter:blur(10px);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .ai-topic-input:focus {
+      border-color:var(--green-primary);
+      box-shadow: 0 0 0 3px rgba(127,176,105,0.12);
+    }
+
+    /* ── Progress dots ── */
+    .progress-indicator { display:flex; justify-content:center; gap:0.8rem; margin-top:1.5rem; flex-wrap:wrap; }
+    .progress-dot {
+      width:10px; height:10px; border-radius:50%; background:var(--bg-card);
+      border:1px solid rgba(127,176,105,0.2); transition:all 0.3s; cursor:pointer;
+    }
+    .progress-dot.active { background:var(--green-primary); transform:scale(1.3); }
+    .progress-dot.visited { background:rgba(127,176,105,0.3); }
+
+    /* ── Keyboard hint ── */
+    .keyboard-hint {
+      text-align:center; margin-top:2rem; font-family:var(--font-mono);
+      font-size:0.65rem; color:var(--text-dim); letter-spacing:0.08em;
+    }
+
+    /* ══════════════════════════════════════════
+       GLASSMORPHISM AI CARDS REVEAL OVERLAY
+    ══════════════════════════════════════════ */
+    .glass-overlay {
+      position:fixed; inset:0; z-index:900;
+      background:rgba(8,10,12,0.85);
+      backdrop-filter:blur(18px);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:2rem 1rem;
+      opacity:0; pointer-events:none;
+      transition: opacity 0.4s ease;
+    }
+    .glass-overlay.active {
+      opacity:1; pointer-events:all;
+    }
+
+    .glass-overlay-title {
+      font-family:var(--font-display); font-size:1.6rem; color:var(--cream);
+      margin-bottom:0.4rem; text-align:center;
+    }
+    .glass-overlay-sub {
+      font-family:var(--font-mono); font-size:0.65rem; color:var(--green-light);
+      letter-spacing:0.15em; text-transform:uppercase; margin-bottom:2.5rem; text-align:center;
+    }
+
+    /* Mini card grid */
+    .glass-card-grid {
+      display:flex; flex-wrap:wrap; gap:1rem;
+      justify-content:center; max-width:900px; width:100%;
+      margin-bottom:2.5rem;
+    }
+
+    .glass-mini-card {
+      width:260px; min-height:140px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(127,176,105,0.25);
+      border-radius:16px;
+      backdrop-filter:blur(20px);
+      padding:1.2rem 1.4rem;
+      display:flex; flex-direction:column; gap:0.6rem;
+      position:relative; overflow:hidden;
+      opacity:0; transform:translateY(30px) scale(0.95);
+      transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s;
+      cursor:pointer;
+    }
+    .glass-mini-card.revealed {
+      opacity:1; transform:translateY(0) scale(1);
+    }
+    .glass-mini-card:hover {
+      box-shadow: 0 8px 32px rgba(127,176,105,0.2);
+      border-color:rgba(127,176,105,0.45);
+      transform:translateY(-3px) scale(1.01);
+    }
+    .glass-mini-card::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg, transparent, rgba(127,176,105,0.6), transparent);
+    }
+
+    .glass-cat-badge {
+      font-family:var(--font-mono); font-size:0.58rem; text-transform:uppercase;
+      letter-spacing:0.12em; color:var(--green-light);
+      background:rgba(127,176,105,0.1); border-radius:999px;
+      padding:0.2rem 0.7rem; width:fit-content;
+    }
+    .glass-q {
+      font-family:var(--font-display); font-size:0.9rem; color:var(--cream);
+      line-height:1.4;
+    }
+    .glass-a {
+      font-size:0.82rem; color:var(--text-muted); line-height:1.5;
+      font-style:italic;
+      display:none;
+    }
+    .glass-mini-card.flipped .glass-a { display:block; }
+    .glass-mini-card.flipped .glass-q { display:none; }
+
+    .glass-reveal-btn {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      padding:0.85rem 2.2rem; border-radius:10px;
+      background:linear-gradient(135deg, rgba(127,176,105,0.2), rgba(127,176,105,0.08));
+      border:1px solid rgba(127,176,105,0.4);
+      color:var(--green-light); font-family:var(--font-mono); font-size:0.8rem;
+      letter-spacing:0.1em; text-transform:uppercase;
+      cursor:pointer; transition:all 0.3s; backdrop-filter:blur(10px);
+    }
+    .glass-reveal-btn:hover {
+      background:rgba(127,176,105,0.25); border-color:var(--green-primary);
+      box-shadow:0 0 24px rgba(127,176,105,0.2);
+    }
+
+    /* Success toast */
+    .toast {
+      position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(20px);
+      background:rgba(127,176,105,0.15); border:1px solid rgba(127,176,105,0.3);
+      backdrop-filter:blur(20px); border-radius:12px;
+      padding:0.8rem 1.8rem; font-family:var(--font-mono); font-size:0.72rem;
+      color:var(--green-light); letter-spacing:0.08em;
+      opacity:0; transition:all 0.4s ease; z-index:1000; pointer-events:none;
+    }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-logo"><span class="nav-eye">👁</span><span>On The Face Of It</span></div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="summary.html">Summary</a></li>
+    <li><a href="flashcards.html" class="active">Flashcards</a></li>
+    <li><a href="quiz.html">Quiz</a></li>
+    <li><a href="assistant.html">AI Assistant</a></li>
+    <li><a href="video.html">Animated Story</a></li>
+  </ul>
+  <div class="nav-toggle" id="navToggle">☰</div>
+</nav>
+
+<section class="page-hero">
+  <p class="page-hero-tag">🃏 Flashcards</p>
+  <h1>Study Flashcards</h1>
+  <p>Click any card to flip it. Navigate with arrows or keyboard. Generate AI-powered cards on any topic!</p>
+</section>
+
+<div class="page-content">
+
+  <!-- AI Generation Section -->
+  <div class="ai-generate-section fade-in">
+    <h3 style="font-family:var(--font-display);color:var(--cream);margin-bottom:1rem;">✨ Generate AI Flashcards</h3>
+    <input type="text" class="ai-topic-input" id="aiTopicInput"
+      placeholder="Enter a topic: e.g. 'themes', 'characters', 'quotes', 'symbols'..."
+      onkeydown="if(event.key==='Enter') generateAIFlashcards()"/>
+    <button class="btn-primary" id="generateBtn" onclick="generateAIFlashcards()">
+      <span id="generateBtnText">Generate Flashcards</span>
+      <span id="generateSpinner" style="display:none" class="loading-spinner"></span>
+    </button>
+    <div id="aiError" style="color:#e8927a;font-size:0.9rem;margin-top:0.8rem;display:none;"></div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs" id="filterTabs">
+    <button class="filter-tab active" onclick="filterCards('all', this)">All</button>
+    <button class="filter-tab" onclick="filterCards('character', this)">Characters</button>
+    <button class="filter-tab" onclick="filterCards('theme', this)">Themes</button>
+    <button class="filter-tab" onclick="filterCards('quote', this)">Quotes</button>
+    <button class="filter-tab" onclick="filterCards('symbol', this)">Symbols</button>
+    <button class="filter-tab" onclick="filterCards('event', this)">Events</button>
+  </div>
+
+  <!-- Flashcard Display -->
+  <div class="flashcard-container" id="flashcardContainer" onclick="flipCard()">
+    <div class="flashcard" id="flashcard">
+      <div class="flashcard-face flashcard-front">
+        <div class="flashcard-category" id="fcCategory">Character</div>
+        <h2 id="fcFront">Who is Derry?</h2>
+        <p class="flashcard-hint">Click to reveal answer</p>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <div class="flashcard-category" id="fcCategoryBack">Character</div>
+        <p id="fcBack">A fourteen-year-old boy with a severely scarred face caused by acid burns. He is the protagonist — bitter, withdrawn, and isolated by society's cruelty. Through his encounter with Mr. Lamb, he transforms into someone hopeful and connected.</p>
+        <p class="flashcard-hint">Click to flip back</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flashcard-nav">
+    <button class="btn-ghost" onclick="prevCard()" style="padding:0.6rem 1.5rem;">← Prev</button>
+    <span class="flashcard-counter">
+      <span id="currentCard">1</span> / <span id="totalCards">20</span>
+    </span>
+    <button class="btn-ghost" onclick="nextCard()" style="padding:0.6rem 1.5rem;">Next →</button>
+  </div>
+
+  <div class="progress-indicator" id="progressDots"></div>
+  <p class="keyboard-hint">Use ← → arrow keys to navigate · Space to flip</p>
+
+</div>
+
+<!-- ══ GLASSMORPHISM AI CARDS OVERLAY ══ -->
+<div class="glass-overlay" id="glassOverlay">
+  <p class="glass-overlay-title" id="glassTitle">✨ 5 New Flashcards Generated</p>
+  <p class="glass-overlay-sub">Tap any card to flip · Click below to start studying</p>
+
+  <div class="glass-card-grid" id="glassCardGrid"></div>
+
+  <button class="glass-reveal-btn" onclick="closeOverlayAndStudy()">
+    📚 Study These Cards →
+  </button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">👁 On The Face Of It</div>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="summary.html">Summary</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="assistant.html">AI Assistant</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+const DEFAULT_CARDS = [
+  { category:'character', front:'Who is Derry?', back:'A fourteen-year-old boy with a severely scarred face caused by acid. He is bitter, withdrawn, and isolated by society\'s reactions. Through Mr. Lamb, he transforms into someone with hope and courage.' },
+  { category:'character', front:'Who is Mr. Lamb?', back:'An elderly man who lost his leg in the war and now wears a tin leg. He lives alone in his garden with an always-open gate, welcoming all. He is the philosophical mentor who changes Derry\'s worldview.' },
+  { category:'theme', front:'What is the central theme of the play?', back:'The central theme is isolation vs. human connection. Both Derry and Mr. Lamb are physically disabled and isolated by society, but Mr. Lamb chooses openness while Derry struggles to overcome bitterness and self-pity.' },
+  { category:'theme', front:'What does the open gate of Mr. Lamb\'s garden symbolize?', back:'The open gate symbolizes inclusivity, welcome, and openness. Mr. Lamb never locks it — everyone and everything is welcome, reflecting his philosophy that life should be embraced without barriers.' },
+  { category:'quote', front:'"There\'s nothing wrong with your face. It\'s a face." — Who says this?', back:'Mr. Lamb says this to Derry. It is a pivotal moment — he refuses to treat Derry\'s scarred face as a problem, seeing him as a whole, complete human being. This is the first time anyone has spoken to Derry this way.' },
+  { category:'symbol', front:'What do the Crab Apples represent?', back:'Crab apples represent things that are dismissed or undervalued by society. Mr. Lamb collects them and makes jelly — showing that even things others discard have value. This parallels how Derry and Mr. Lamb themselves are undervalued.' },
+  { category:'event', front:'How does the play end?', back:'Mr. Lamb falls from a ladder while picking crab apples and dies. When Derry rushes back to the garden, he finds Mr. Lamb dead. Derry weeps — showing how deeply Mr. Lamb had transformed him.' },
+  { category:'theme', front:'What is the significance of the title "On the Face of It"?', back:'The title is deeply ironic. "On the face of it" means judging by surface appearances — exactly what society does to the disabled protagonists. The play argues we must look beyond faces and appearances to see the true person within.' },
+  { category:'character', front:'What role does Derry\'s mother play?', back:'Derry\'s mother represents overprotective love. She tries to discourage him from returning to Mr. Lamb\'s garden, warning him the old man is "odd." Her protectiveness reinforces Derry\'s isolation rather than helping him grow.' },
+  { category:'event', front:'What anecdote does Mr. Lamb tell Derry?', back:'Mr. Lamb tells of a man who locked himself in a room to avoid the world\'s dangers, and was killed when a picture fell off the wall. The message: you cannot hide from life.' },
+  { category:'symbol', front:'What does Mr. Lamb\'s garden represent?', back:'The garden represents life, openness, and acceptance. Everything is welcome — weeds, bees, crab apples, strangers. It contrasts with the walls and locks that symbolize isolation.' },
+  { category:'theme', front:'How do Derry and Mr. Lamb differ in their approach to disability?', back:'Derry is consumed by bitterness and self-pity. Mr. Lamb, despite his tin leg, embraces life fully and finds joy everywhere. Mr. Lamb is Derry\'s mirror — showing him who he could become.' },
+  { category:'quote', front:'"He\'s the only person who ever talked to me... like it didn\'t matter."', back:'Derry says this to his mother about Mr. Lamb — the first person to treat Derry as a normal, complete human being, not as a disfigured person to be pitied or feared.' },
+  { category:'character', front:'Why does Derry initially enter Mr. Lamb\'s garden?', back:'Derry climbs over the wall believing the garden is empty, wanting to be alone. He has become accustomed to seeking solitude to avoid people\'s reactions to his scarred face.' },
+  { category:'symbol', front:'What does the ladder represent?', back:'The ladder represents risk, ambition, and living fully. Mr. Lamb dies climbing a ladder to pick crab apples. His death is a final act of living — he died doing, not hiding.' },
+  { category:'event', front:'What is the turning point in Derry\'s character?', back:'The turning point is when Derry decides to return to Mr. Lamb\'s garden against his mother\'s wishes. For the first time, he chooses connection and independence over isolation.' },
+  { category:'theme', front:'What does the play say about loneliness?', back:'Loneliness is a choice of perspective. Mr. Lamb, though physically alone, is never lonely — he finds companionship in everything around him. Derry\'s loneliness is self-imposed through bitterness.' },
+  { category:'quote', front:'"Weeds are plants. The gate\'s always open." — What does this mean?', back:'Mr. Lamb\'s philosophy of universal welcome. "Weeds" represent things society dismisses — like Derry\'s face, or his own tin leg. The open gate means no one is excluded from life\'s garden.' },
+  { category:'character', front:'How does Derry change by the end of the play?', back:'Derry transforms from a bitter, isolated boy into someone capable of love, grief, and connection. His tears at Mr. Lamb\'s death prove his emotional awakening.' },
+  { category:'theme', front:'What is the play\'s message about physical appearance?', back:'Physical appearance is superficial and should not define a person\'s worth. Both protagonists have visible disabilities, yet their inner lives are rich. Society\'s focus on appearance causes needless suffering.' },
+];
+
+let allCards = [...DEFAULT_CARDS];
+let filteredCards = [...allCards];
+let currentIndex = 0;
+let isFlipped = false;
+let pendingNewCards = [];
+
+// ── Core flashcard functions ──────────
+
+function buildDots() {
+  const container = document.getElementById('progressDots');
+  container.innerHTML = '';
+  filteredCards.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot' + (i === currentIndex ? ' active' : (i < currentIndex ? ' visited' : ''));
+    dot.onclick = () => goToCard(i);
+    container.appendChild(dot);
+  });
+}
+
+function updateCard() {
+  const card = filteredCards[currentIndex];
+  if (!card) return;
+  document.getElementById('fcFront').textContent = card.front;
+  document.getElementById('fcBack').textContent = card.back;
+  document.getElementById('fcCategory').textContent = card.category.toUpperCase();
+  document.getElementById('fcCategoryBack').textContent = card.category.toUpperCase();
+  document.getElementById('currentCard').textContent = currentIndex + 1;
+  document.getElementById('totalCards').textContent = filteredCards.length;
+  if (isFlipped) {
+    isFlipped = false;
+    document.getElementById('flashcard').classList.remove('flipped');
+  }
+  buildDots();
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+}
+
+function nextCard() {
+  currentIndex = (currentIndex + 1) % filteredCards.length;
+  updateCard();
+}
+
+function prevCard() {
+  currentIndex = (currentIndex - 1 + filteredCards.length) % filteredCards.length;
+  updateCard();
+}
+
+function goToCard(i) { currentIndex = i; updateCard(); }
+
+function filterCards(cat, btn) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  filteredCards = cat === 'all' ? [...allCards] : allCards.filter(c => c.category === cat);
+  currentIndex = 0;
+  updateCard();
+}
+
+// ── Toast ─────────────────────────────
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Glassmorphism overlay ─────────────
+
+function showGlassOverlay(cards) {
+  pendingNewCards = cards;
+  const grid = document.getElementById('glassCardGrid');
+  const title = document.getElementById('glassTitle');
+  grid.innerHTML = '';
+  title.textContent = `✨ ${cards.length} New Flashcards Generated`;
+
+  cards.forEach((card, i) => {
+    const el = document.createElement('div');
+    el.className = 'glass-mini-card';
+    el.innerHTML = `
+      <span class="glass-cat-badge">${card.category}</span>
+      <p class="glass-q">${card.front}</p>
+      <p class="glass-a">${card.back}</p>
+    `;
+    el.onclick = (e) => {
+      e.stopPropagation();
+      el.classList.toggle('flipped');
+    };
+    grid.appendChild(el);
+
+    // Staggered entrance animation
+    setTimeout(() => el.classList.add('revealed'), 80 + i * 120);
+  });
+
+  document.getElementById('glassOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOverlayAndStudy() {
+  document.getElementById('glassOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+
+  // Merge new cards at front
+  allCards = [...pendingNewCards, ...DEFAULT_CARDS];
+  filteredCards = [...allCards];
+  currentIndex = 0;
+
+  // Reset filter tabs
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.filter-tab').classList.add('active');
+
+  updateCard();
+  showToast(`✅ ${pendingNewCards.length} AI cards added — studying now!`);
+
+  // Scroll to card
+  document.getElementById('flashcardContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ── AI Generation ─────────────────────
+
+async function generateAIFlashcards() {
+  const topic = document.getElementById('aiTopicInput').value.trim();
+  if (!topic) {
+    showAIError('Please enter a topic to generate flashcards about.');
+    return;
+  }
+
+  const btn = document.getElementById('generateBtn');
+  document.getElementById('generateBtnText').textContent = 'Generating...';
+  document.getElementById('generateSpinner').style.display = 'inline-block';
+  btn.disabled = true;
+  document.getElementById('aiError').style.display = 'none';
+
+  try {
+    const response = await fetch('/api/flashcards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Server error');
+    const newCards = data.cards;
+    if (!newCards || newCards.length === 0) throw new Error('No cards returned. Try again.');
+
+    document.getElementById('aiTopicInput').value = '';
+    showGlassOverlay(newCards);   // ← Auto-show the glass overlay!
+
+  } catch (err) {
+    showAIError(err.message || 'Could not generate flashcards. Check your API key or try again.');
+  } finally {
+    document.getElementById('generateBtnText').textContent = 'Generate Flashcards';
+    document.getElementById('generateSpinner').style.display = 'none';
+    btn.disabled = false;
+  }
+}
+
+function showAIError(msg) {
+  const el = document.getElementById('aiError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ── Keyboard navigation ───────────────
+document.addEventListener('keydown', (e) => {
+  // Don't hijack when overlay is open or typing in input
+  if (document.getElementById('glassOverlay').classList.contains('active')) return;
+  if (document.activeElement === document.getElementById('aiTopicInput')) return;
+  if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'Escape') closeOverlayAndStudy();
+});
+
+// Close overlay on backdrop click
+document.getElementById('glassOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeOverlayAndStudy();
+});
+
+// Init
+updateCard();
+</script>
+</body>
+</html>

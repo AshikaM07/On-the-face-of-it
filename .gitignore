@@ -1,0 +1,19 @@
+# Dependencies — never commit these
+node_modules/
+
+# Environment variables — NEVER commit your real keys
+.env
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime
+.nyc_output
+coverage/

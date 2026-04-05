@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Presentation — On The Face Of It</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;overflow-x:hidden}
+body{background:#060908;color:#f4efe6;font-family:'Cormorant Garamond',Georgia,serif}
+a{text-decoration:none;color:inherit}
+
+/* ── DEEP BACKGROUND ── */
+.bg-canvas{
+  position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:radial-gradient(ellipse 140% 80% at 10% 20%,#0d2208 0%,transparent 60%),
+             radial-gradient(ellipse 100% 90% at 90% 80%,#071a04 0%,transparent 55%),
+             #060908;
+}
+.bg-orb{position:absolute;border-radius:50%;filter:blur(110px);animation:orbFloat var(--dur,22s) ease-in-out infinite alternate;will-change:transform}
+.bg-orb-1{width:900px;height:900px;background:radial-gradient(circle,rgba(30,74,16,.55),transparent 70%);top:-250px;left:-250px;--dur:20s}
+.bg-orb-2{width:700px;height:700px;background:radial-gradient(circle,rgba(58,122,40,.4),transparent 70%);bottom:-180px;right:-180px;--dur:27s}
+.bg-orb-3{width:450px;height:450px;background:radial-gradient(circle,rgba(127,176,105,.18),transparent 70%);top:40%;left:40%;--dur:15s;animation-direction:alternate-reverse}
+.bg-orb-4{width:300px;height:300px;background:radial-gradient(circle,rgba(80,140,60,.25),transparent 70%);top:20%;right:15%;--dur:18s}
+@keyframes orbFloat{to{transform:translate(40px,30px)scale(1.08)}}
+
+/* ── GLASS NOISE ── */
+.bg-noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px 180px}
+
+/* ── PARTICLES ── */
+.ptcl-field{position:fixed;inset:0;pointer-events:none;z-index:2}
+.ptcl{position:absolute;border-radius:50%;animation:ptclRise var(--t,18s) linear infinite;animation-delay:var(--dl,0s);width:var(--s,2px);height:var(--s,2px);background:rgba(127,176,105,var(--op,.3))}
+@keyframes ptclRise{0%{transform:translateY(100vh)translateX(0);opacity:0}8%{opacity:var(--op,.3)}88%{opacity:var(--op,.3)}100%{transform:translateY(-80px)translateX(var(--dx,20px));opacity:0}}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2.5rem;
+  background:rgba(6,9,8,.42);
+  backdrop-filter:blur(32px) saturate(1.8);
+  -webkit-backdrop-filter:blur(32px) saturate(1.8);
+  border-bottom:1px solid rgba(127,176,105,.13);
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 4px 30px rgba(0,0,0,.4);
+}
+.nav::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(127,176,105,.55) 35%,rgba(200,255,170,.3) 50%,rgba(127,176,105,.55) 65%,transparent)}
+.nav-brand{display:flex;align-items:center;gap:.55rem;font-family:'Playfair Display',Georgia,serif;font-size:1.05rem;font-weight:700;color:#f4efe6}
+.nav-brand-dot{width:7px;height:7px;border-radius:50%;background:#7fb069;box-shadow:0 0 10px rgba(127,176,105,.9),0 0 22px rgba(127,176,105,.4)}
+.nav-links{list-style:none;display:flex;gap:1.8rem}
+.nav-links a{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,190,170,.5);transition:color .25s,text-shadow .25s}
+.nav-links a:hover,.nav-links a.active{color:#a8d890;text-shadow:0 0 14px rgba(127,176,105,.6)}
+.nav-ham{display:none;background:none;border:none;cursor:pointer;font-size:1.4rem;color:#f4efe6}
+@media(max-width:720px){.nav-links{display:none}.nav-ham{display:block}.nav{padding:.9rem 1.4rem}}
+
+/* ── HERO ── */
+.page-hero{position:relative;z-index:10;text-align:center;padding:4rem 1.5rem 2.8rem}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font-family:'Space Mono',monospace;font-size:.54rem;letter-spacing:.28em;text-transform:uppercase;
+  color:#a8d890;padding:.45em 1.2em;
+  background:rgba(127,176,105,.07);
+  border:1px solid rgba(127,176,105,.22);
+  border-radius:100px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 2px 18px rgba(127,176,105,.1),0 1px 0 rgba(255,255,255,.06) inset;
+  margin-bottom:1.3rem;
+}
+.hero-pill-dot{width:5px;height:5px;border-radius:50%;background:#7fb069;box-shadow:0 0 8px rgba(127,176,105,.9)}
+.page-hero h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:900;line-height:1.05;color:#f4efe6;text-shadow:0 2px 30px rgba(0,0,0,.6),0 0 60px rgba(127,176,105,.08)}
+.page-hero h1 em{color:#a8d890;font-style:italic;text-shadow:0 0 32px rgba(127,176,105,.5)}
+.page-hero-sub{margin-top:.8rem;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:rgba(200,190,170,.55);max-width:500px;margin-left:auto;margin-right:auto}
+.hero-line{width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(127,176,105,.65),transparent);margin:1.4rem auto 0;box-shadow:0 0 14px rgba(127,176,105,.3)}
+
+/* ── MAIN ── */
+.main{position:relative;z-index:10;max-width:1120px;margin:0 auto;padding:0 1.5rem 5rem}
+
+/* ── OUTER GLOW RING ── */
+.glass-glow-ring{
+  position:relative;
+  border-radius:28px;
+  padding:1px;
+  background:linear-gradient(135deg,rgba(127,176,105,.35) 0%,rgba(255,255,255,.06) 40%,rgba(127,176,105,.2) 70%,rgba(200,240,180,.3) 100%);
+  box-shadow:0 0 60px rgba(127,176,105,.12),0 0 120px rgba(127,176,105,.07),0 60px 120px rgba(0,0,0,.7);
+  animation:ringPulse 5s ease-in-out infinite alternate;
+}
+@keyframes ringPulse{from{box-shadow:0 0 40px rgba(127,176,105,.1),0 60px 120px rgba(0,0,0,.7)}to{box-shadow:0 0 80px rgba(127,176,105,.18),0 0 160px rgba(127,176,105,.07),0 60px 120px rgba(0,0,0,.7)}}
+
+/* ── GLASS CARD ── */
+.glass-card{
+  position:relative;
+  background:rgba(8,14,7,.42);
+  backdrop-filter:blur(48px) saturate(1.8) brightness(1.04);
+  -webkit-backdrop-filter:blur(48px) saturate(1.8) brightness(1.04);
+  border-radius:27px;
+  overflow:hidden;
+  padding:6px;
+}
+/* frosted sheen */
+.glass-card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:30;border-radius:27px;
+  background:linear-gradient(135deg,
+    rgba(255,255,255,.08) 0%,
+    rgba(255,255,255,.02) 25%,
+    transparent 50%,
+    rgba(127,176,105,.025) 75%,
+    rgba(255,255,255,.01) 100%);
+}
+/* top shimmer */
+.glass-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;z-index:40;pointer-events:none;
+  background:linear-gradient(90deg,transparent 5%,rgba(127,176,105,.75) 30%,rgba(220,255,200,.6) 50%,rgba(127,176,105,.75) 70%,transparent 95%);
+}
+
+/* ── IFRAME SHELL ── */
+.iframe-shell{
+  position:relative;width:100%;padding-bottom:56.25%;
+  border-radius:22px;overflow:hidden;
+  background:rgba(2,5,2,.9);
+  box-shadow:0 4px 30px rgba(0,0,0,.5) inset;
+}
+.iframe-shell iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+
+/* scan shimmer */
+.iframe-shell::before{
+  content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.025),transparent);
+  animation:scanShim 7s ease-in-out infinite;pointer-events:none;z-index:10;
+}
+@keyframes scanShim{0%,100%{left:-60%}50%{left:130%}}
+
+/* ── BOTTOM INFO BAR ── */
+.info-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.85rem 1.5rem .7rem;
+  flex-wrap:wrap;gap:.5rem;
+  border-top:1px solid rgba(127,176,105,.08);
+  background:rgba(127,176,105,.03);
+}
+.live-dot-wrap{display:flex;align-items:center;gap:.55rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#7fb069;box-shadow:0 0 8px rgba(127,176,105,.9);animation:livePulse 2s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:.5;box-shadow:0 0 4px rgba(127,176,105,.5)}50%{opacity:1;box-shadow:0 0 12px rgba(127,176,105,1),0 0 24px rgba(127,176,105,.4)}}
+.live-label{font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(127,176,105,.7)}
+.info-hint{font-family:'Cormorant Garamond',serif;font-size:.82rem;font-style:italic;color:rgba(200,190,170,.3)}
+
+/* corner accents */
+.corner{position:absolute;width:32px;height:32px;pointer-events:none;z-index:50}
+.corner-tl{top:6px;left:6px;border-top:1.5px solid rgba(127,176,105,.5);border-left:1.5px solid rgba(127,176,105,.5);border-radius:22px 0 0 0}
+.corner-tr{top:6px;right:6px;border-top:1.5px solid rgba(127,176,105,.35);border-right:1.5px solid rgba(127,176,105,.35);border-radius:0 22px 0 0}
+.corner-bl{bottom:6px;left:6px;border-bottom:1.5px solid rgba(127,176,105,.35);border-left:1.5px solid rgba(127,176,105,.35);border-radius:0 0 0 22px}
+.corner-br{bottom:6px;right:6px;border-bottom:1.5px solid rgba(127,176,105,.5);border-right:1.5px solid rgba(127,176,105,.5);border-radius:0 0 22px 0}
+
+/* ── META CHIPS ── */
+.meta-row{display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-top:2rem;flex-wrap:wrap}
+.meta-chip{
+  display:flex;align-items:center;gap:.5rem;
+  font-family:'Space Mono',monospace;font-size:.48rem;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(200,190,170,.42);
+  padding:.4em 1em;
+  background:rgba(127,176,105,.05);
+  border:1px solid rgba(127,176,105,.1);
+  border-radius:100px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:all .3s ease;
+}
+.meta-chip:hover{color:rgba(200,235,180,.75);border-color:rgba(127,176,105,.3);background:rgba(127,176,105,.1);box-shadow:0 0 20px rgba(127,176,105,.12)}
+.meta-dot{width:4px;height:4px;border-radius:50%;background:rgba(127,176,105,.55)}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:10;
+  padding:2.2rem 2.5rem;
+  background:rgba(6,9,8,.38);
+  backdrop-filter:blur(30px) saturate(1.6);
+  -webkit-backdrop-filter:blur(30px) saturate(1.6);
+  border-top:1px solid rgba(127,176,105,.09);
+  text-align:center;
+}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(127,176,105,.32),transparent)}
+.ft-logo{font-family:'Playfair Display',Georgia,serif;font-size:.95rem;font-weight:700;color:rgba(200,190,170,.65);margin-bottom:.4rem}
+.ft-sub{font-size:.8rem;font-style:italic;color:rgba(200,190,170,.3);margin-bottom:.9rem}
+.ft-links{display:flex;justify-content:center;gap:1.4rem;flex-wrap:wrap}
+.ft-links a{font-family:'Space Mono',monospace;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(200,190,170,.38);transition:color .25s;padding:.3em .6em;border-radius:4px}
+.ft-links a:hover{color:#a8d890;background:rgba(127,176,105,.07)}
+
+@media(max-width:640px){
+  .page-hero{padding:2.5rem 1rem 1.8rem}
+  .main{padding:0 .9rem 3rem}
+  .info-bar{flex-direction:column;align-items:flex-start}
+  .meta-row{gap:.8rem}
+  footer{padding:1.6rem 1.2rem}
+  .ft-links{gap:1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-canvas" aria-hidden="true">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <div class="bg-orb bg-orb-4"></div>
+</div>
+<div class="bg-noise" aria-hidden="true"></div>
+<div class="ptcl-field" id="pf" aria-hidden="true"></div>
+
+<!-- Nav -->
+<nav class="nav" role="navigation">
+  <div class="nav-brand">
+    <div class="nav-brand-dot"></div>
+    &#128065;&nbsp;On The Face Of It
+  </div>
+  <ul class="nav-links" id="nl">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="summary.html">Summary</a></li>
+    <li><a href="flashcards.html">Flashcards</a></li>
+    <li><a href="quiz.html">Quiz</a></li>
+    <li><a href="assistant.html">AI Assistant</a></li>
+    <li><a href="video.html" class="active">Presentation</a></li>
+  </ul>
+  <button class="nav-ham" id="ham" aria-label="Toggle menu">&#9776;</button>
+</nav>
+
+<!-- Hero -->
+<header class="page-hero">
+  <div class="hero-pill">
+    <div class="hero-pill-dot"></div>
+    Interactive Slide Presentation
+  </div>
+  <h1>On The <em>Face</em> Of It</h1>
+  <p class="page-hero-sub">Susan Hill's poignant play &mdash; brought to life, slide by slide</p>
+  <div class="hero-line"></div>
+</header>
+
+<!-- Main -->
+<main class="main">
+
+  <div class="glass-glow-ring">
+    <div class="glass-card">
+
+      <!-- Corner accents -->
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <!-- Iframe -->
+      <div class="iframe-shell">
+        <iframe
+          src="https://docs.google.com/presentation/d/e/2PACX-1vTZf3LJ960Sbo_OxTHsoSoV2PIC8w8lCiJtx1id9O4V3sjg8RcY25Gl-uo7sZknig/pubembed?start=true&loop=true&delayms=3000"
+          frameborder="0"
+          allowfullscreen="true"
+          mozallowfullscreen="true"
+          webkitallowfullscreen="true"
+          title="On The Face Of It — Google Slides Presentation"
+          loading="lazy"
+        ></iframe>
+      </div>
+
+      <!-- Info bar -->
+      <div class="info-bar">
+        <div class="live-dot-wrap">
+          <div class="live-dot"></div>
+          <span class="live-label">Live Presentation</span>
+        </div>
+        <span class="info-hint">Navigate with arrows inside &bull; Auto-advances every 3 seconds &bull; Click fullscreen to expand</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Meta -->
+  <div class="meta-row">
+    <div class="meta-chip"><div class="meta-dot"></div>Susan Hill</div>
+    <div class="meta-chip"><div class="meta-dot"></div>CBSE Class 12 &middot; Vistas</div>
+    <div class="meta-chip"><div class="meta-dot"></div>One-Act Play</div>
+    <div class="meta-chip"><div class="meta-dot"></div>Isolation &bull; Acceptance &bull; Friendship</div>
+    <div class="meta-chip"><div class="meta-dot"></div>Disability &bull; Optimism</div>
+  </div>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="ft-logo">&#128065; On The Face Of It</div>
+  <p class="ft-sub">An interactive learning experience for CBSE Class 12 English</p>
+  <div class="ft-links">
+    <a href="index.html">Home</a>
+    <a href="summary.html">Summary</a>
+    <a href="flashcards.html">Flashcards</a>
+    <a href="quiz.html">Quiz</a>
+    <a href="assistant.html">AI Assistant</a>
+  </div>
+</footer>
+
+<script>
+// Floating particles
+(function(){
+  const f=document.getElementById('pf');
+  for(let i=0;i<32;i++){
+    const p=document.createElement('div');
+    p.className='ptcl';
+    const sz=Math.random()*2.2+.6;
+    p.style.cssText=`left:${Math.random()*100}%;--s:${sz}px;--t:${13+Math.random()*22}s;--dl:${-(Math.random()*28)}s;--op:${.07+Math.random()*.25};--dx:${(Math.random()-.5)*80}px`;
+    f.appendChild(p);
+  }
+})();
+
+// Hamburger nav
+document.getElementById('ham').addEventListener('click',()=>{
+  const nl=document.getElementById('nl');
+  const open=nl.style.display==='flex';
+  Object.assign(nl.style,{
+    display:open?'none':'flex',flexDirection:'column',
+    position:'absolute',top:'60px',left:'0',right:'0',
+    background:'rgba(6,9,8,.94)',
+    padding:'1rem 1.5rem',
+    backdropFilter:'blur(32px)',WebkitBackdropFilter:'blur(32px)',
+    borderBottom:'1px solid rgba(127,176,105,.12)',
+    zIndex:'300',gap:'1rem'
+  });
+});
+</script>
+</body>
+</html>

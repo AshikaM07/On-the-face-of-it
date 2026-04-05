@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>On The Face Of It — A World Unseen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-logo">
+    <span class="nav-eye">👁</span>
+    <span>On The Face Of It</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="summary.html">Summary</a></li>
+    <li><a href="flashcards.html">Flashcards</a></li>
+    <li><a href="quiz.html">Quiz</a></li>
+    <li><a href="assistant.html">AI Assistant</a></li>
+    <li><a href="video.html">Animated Story</a></li>
+  </ul>
+  <div class="nav-toggle" id="navToggle">☰</div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="garden-layer layer1"></div>
+    <div class="garden-layer layer2"></div>
+    <div class="particles" id="particles"></div>
+    <div class="fog-layer"></div>
+  </div>
+
+  <div class="hero-3d-scene">
+    <div class="book-3d" id="book3d">
+      <div class="book-face front">
+        <div class="book-title-block">
+          <p class="book-subtitle-top">Susan Hill</p>
+          <h1 class="book-main-title">On The<br/><em>Face</em><br/>Of It</h1>
+          <p class="book-tag">A Play of Light & Shadow</p>
+        </div>
+        <div class="book-texture"></div>
+      </div>
+      <div class="book-face back"></div>
+      <div class="book-spine"></div>
+      <div class="book-top"></div>
+      <div class="book-bottom"></div>
+      <div class="book-pages"></div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-text-block">
+      <p class="hero-overline">CBSE Class 12 · English Supplementary</p>
+      <h2 class="hero-heading">Explore the World<br/>of <span class="highlight-text">Mr. Lamb</span> & <span class="highlight-text">Derry</span></h2>
+      <p class="hero-desc">A story about acceptance, isolation, and the courage to see beyond appearances. Dive into every dimension of this poignant play.</p>
+      <div class="hero-cta-row">
+        <a href="summary.html" class="btn-primary">Read Summary</a>
+        <a href="assistant.html" class="btn-ghost">Ask AI Assistant</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card">
+        <span class="stat-number" data-target="6">0</span>
+        <span class="stat-label">Key Themes</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" data-target="20">0</span>
+        <span class="stat-label">Flashcards</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" data-target="15">0</span>
+        <span class="stat-label">Quiz Questions</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span>Scroll to Explore</span>
+  </div>
+</section>
+
+<!-- ═══════════════ ABOUT SECTION ═══════════════ -->
+<section class="about-section" id="about">
+  <div class="section-header">
+    <span class="section-tag">THE STORY</span>
+    <h2>Two Broken Men,<br/>One Walled Garden</h2>
+  </div>
+  <div class="about-grid">
+    <div class="char-card" data-char="derry">
+      <div class="char-card-inner">
+        <div class="char-card-front">
+          <div class="char-icon">🧒</div>
+          <h3>Derry</h3>
+          <p>A fourteen-year-old boy with a scarred face, isolated by society's cruelty and his own bitterness.</p>
+        </div>
+        <div class="char-card-back">
+          <h3>Character Traits</h3>
+          <ul>
+            <li>Self-conscious & withdrawn</li>
+            <li>Angry at the world</li>
+            <li>Secretly yearning for acceptance</li>
+            <li>Transformed by Mr. Lamb</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="story-connector">
+      <div class="vine-animation">
+        <svg viewBox="0 0 100 300" class="vine-svg">
+          <path class="vine-path" d="M50,0 Q80,50 50,100 Q20,150 50,200 Q80,250 50,300" stroke="#7fb069" fill="none" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="theme-pills">
+        <span class="pill">Isolation</span>
+        <span class="pill">Acceptance</span>
+        <span class="pill">Courage</span>
+        <span class="pill">Friendship</span>
+        <span class="pill">Death</span>
+        <span class="pill">Optimism</span>
+      </div>
+    </div>
+
+    <div class="char-card" data-char="lamb">
+      <div class="char-card-inner">
+        <div class="char-card-front">
+          <div class="char-icon">👴</div>
+          <h3>Mr. Lamb</h3>
+          <p>An old man with a tin leg, living alone in his garden — yet the most alive character in the story.</p>
+        </div>
+        <div class="char-card-back">
+          <h3>Character Traits</h3>
+          <ul>
+            <li>Philosophically wise</li>
+            <li>Warmly optimistic</li>
+            <li>Embraces all life equally</li>
+            <li>Mentor & healer</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FEATURES SECTION ═══════════════ -->
+<section class="features-section" id="features">
+  <div class="section-header light">
+    <span class="section-tag">TOOLS</span>
+    <h2>Everything You Need<br/>To Master This Story</h2>
+  </div>
+  <div class="features-grid">
+    <a href="summary.html" class="feature-card fc-summary">
+      <div class="fc-icon">📖</div>
+      <h3>Story Summary</h3>
+      <p>Detailed chapter-by-chapter breakdown with analysis of themes, symbols, and literary devices.</p>
+      <span class="fc-arrow">→</span>
+    </a>
+    <a href="flashcards.html" class="feature-card fc-flash">
+      <div class="fc-icon">🃏</div>
+      <h3>AI Flashcards</h3>
+      <p>Flip-card style study material generated by AI covering quotes, meanings, characters, and themes.</p>
+      <span class="fc-arrow">→</span>
+    </a>
+    <a href="quiz.html" class="feature-card fc-quiz">
+      <div class="fc-icon">🎯</div>
+      <h3>Interactive Quiz</h3>
+      <p>Test your knowledge with MCQs, fill-in-the-blanks, and true/false — with instant feedback.</p>
+      <span class="fc-arrow">→</span>
+    </a>
+    <a href="assistant.html" class="feature-card fc-ai">
+      <div class="fc-icon">🤖</div>
+      <h3>AI Assistant</h3>
+      <p>Ask any question about the story — characters, themes, quotes — powered by Claude AI.</p>
+      <span class="fc-arrow">→</span>
+    </a>
+    <a href="video.html" class="feature-card fc-video">
+      <div class="fc-icon">🎬</div>
+      <h3>Animated Story</h3>
+      <p>Watch the story come alive through a beautifully animated scene-by-scene visual narrative.</p>
+      <span class="fc-arrow">→</span>
+    </a>
+    <div class="feature-card fc-quote">
+      <div class="fc-icon">💬</div>
+      <blockquote>"Words. They mean something. They can change things."</blockquote>
+      <cite>— Mr. Lamb</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ THEMES SECTION ═══════════════ -->
+<section class="themes-section">
+  <div class="section-header">
+    <span class="section-tag">THEMES</span>
+    <h2>The Garden of Ideas</h2>
+  </div>
+  <div class="themes-orbs-container">
+    <div class="theme-orb orb1"><span>Isolation</span></div>
+    <div class="theme-orb orb2"><span>Acceptance</span></div>
+    <div class="theme-orb orb3"><span>Physical Disability</span></div>
+    <div class="theme-orb orb4"><span>Human Connection</span></div>
+    <div class="theme-orb orb5"><span>Life & Death</span></div>
+    <div class="theme-orb orb6"><span>Optimism</span></div>
+    <div class="theme-center">
+      <div class="center-icon">🌻</div>
+      <p>On The<br/>Face Of It</p>
+    </div>
+    <svg class="orb-connections" viewBox="0 0 600 600">
+      <line class="orb-line" x1="300" y1="300" x2="300" y2="60"/>
+      <line class="orb-line" x1="300" y1="300" x2="540" y2="190"/>
+      <line class="orb-line" x1="300" y1="300" x2="540" y2="410"/>
+      <line class="orb-line" x1="300" y1="300" x2="300" y2="540"/>
+      <line class="orb-line" x1="300" y1="300" x2="60" y2="410"/>
+      <line class="orb-line" x1="300" y1="300" x2="60" y2="190"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">👁 On The Face Of It</div>
+    <p>An interactive learning experience for CBSE Class 12 English</p>
+    <div class="footer-links">
+      <a href="summary.html">Summary</a>
+      <a href="flashcards.html">Flashcards</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="assistant.html">AI Assistant</a>
+      <a href="video.html">Animated Story</a>
+    </div>
+    <p class="footer-credit">Built with ❤ for Literature Learners</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
